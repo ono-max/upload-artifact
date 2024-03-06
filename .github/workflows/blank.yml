@@ -4,19 +4,25 @@ on: [push]
 
 jobs:
   job_1:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     name: Add 3 and 7
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - shell: bash
         run: |
-          expr 3 + 7 > hoge/math-homework.txt
+          expr 3 + 7 > math-homework.txt
       - name: Upload math result for job 1
         uses: actions/upload-artifact@v4
         with:
-          name: homework_pre
-          path: hoge/math-homework.txt
+          name: ${{ matrix.os }}
+          path: math-homework.txt
 
   job_2:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     name: Multiply by 9
     needs: job_1
     runs-on: windows-latest
@@ -24,8 +30,8 @@ jobs:
       - name: Download math result for job 1
         uses: actions/download-artifact@v4
         with:
-          name: homework_pre
+          name: ${{ matrix.os }}
       - shell: bash
         run: |
-          value=`cat hoge/math-homework.txt`
+          value=`cat math-homework.txt`
           echo The result is $value
